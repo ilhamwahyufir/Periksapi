@@ -9,11 +9,15 @@ const app = express();
 
 
 // ================== KONEKSI DB ================== //
+// paling atas tambahin ini (lihat langkah 2)
+require("dotenv").config();
+
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'sistempakar_sapi1'
+  host: process.env.DB_HOST || "localhost",
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "sistempakar_sapi1",
 });
 
 db.connect((err) => {
