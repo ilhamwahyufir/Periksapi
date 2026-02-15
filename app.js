@@ -1,4 +1,4 @@
-// FILE: app.js (FINAL AUTO ID G01 & P01 + RIWAYAT + EDIT + TENTANG)
+// FILE: app.js (FIXED - NO CRASH TANPA DATABASE)
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
@@ -7,27 +7,91 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 
-
-// ================== KONEKSI DB ================== //
-// paling atas tambahin ini (lihat langkah 2)
+// ================== KONEKSI DB (OPTIONAL) ================== //
 require("dotenv").config();
 
+// Fungsi untuk membuat koneksi database (OPTIONAL)
+let db = null;
+let dbAvailable = false;
 
-db.connect((err) => {
-    if (err) {
-        console.error("DB ERROR:", err);
-        process.exit(1);
+function initDatabase() {
+    // Cek apakah ada konfigurasi database
+    const hasDbConfig = process.env.MYSQL_HOST || process.env.DATABASE_URL;
+    
+    if (!hasDbConfig) {
+        console.log("⚠️  Database tidak dikonfigurasi - aplikasi berjalan tanpa database");
+        console.log("📝 Untuk mengaktifkan database, tambahkan environment variables:");
+        console.log("   MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE");
+        return;
     }
-    console.log("Database Connected");
-    ensureAdminExists();
-});
+
+    try {
+        // Buat koneksi database
+        if (process.env.DATABASE_URL) {
+            // Parse DATABASE_URL dari Railway
+            const dbUrl = new URL(process.env.DATABASE_URL);
+            db = mysql.createConnection({
+                host: dbUrl.hostname,
+                user: dbUrl.username,
+                password: dbUrl.password,
+                database: dbUrl.pathname.substring(1),
+                port: dbUrl.port || 3306
+            });
+        } else {
+            // Gunakan environment variables terpisah
+            db = mysql.createConnection({
+                host: process.env.MYSQL_HOST || 'localhost',
+                user: process.env.MYSQL_USER || 'root',
+                password: process.env.MYSQL_PASSWORD || '',
+                database: process.env.MYSQL_DATABASE || 'sistem_pakar',
+                port: process.env.MYSQL_PORT || 3306
+            });
+        }
+
+        // Coba koneksi (tidak akan crash jika gagal)
+        db.connect((err) => {
+            if (err) {
+                console.error("⚠️  Database tidak tersedia:", err.message);
+                console.log("📝 Aplikasi tetap berjalan tanpa database");
+                db = null;
+                dbAvailable = false;
+            } else {
+                console.log("✅ Database terhubung");
+                dbAvailable = true;
+                ensureAdminExists();
+            }
+        });
+
+        // Handle koneksi terputus
+        db.on('error', (err) => {
+            if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+                console.log("⚠️  Koneksi database terputus");
+                dbAvailable = false;
+            }
+        });
+
+    } catch (error) {
+        console.error("⚠️  Error setup database:", error.message);
+        console.log("📝 Aplikasi tetap berjalan tanpa database");
+        db = null;
+        dbAvailable = false;
+    }
+}
+
+// Inisialisasi database
+initDatabase();
+
+// Helper function untuk cek database
+function isDatabaseAvailable() {
+    return dbAvailable && db !== null;
+}
 
 // ================== MIDDLEWARE ================== //
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(session({
-    secret: "rahasia",
+    secret: process.env.SESSION_SECRET || "rahasia",
     resave: false,
     saveUninitialized: true
 }));
@@ -37,14 +101,20 @@ app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// make user info available to partials
+// Middleware untuk cek database availability
+app.use((req, res, next) => {
+    req.dbAvailable = isDatabaseAvailable();
+    res.locals.dbAvailable = req.dbAvailable;
+    next();
+});
+
+// Make user info available to partials
 app.use((req, res, next) => {
     res.locals.userName = req.session.nama || null;
     res.locals.userEmail = req.session.email || null;
     res.locals.role = req.session.role || null;
     next();
 });
-
 
 // ================== PROTEKSI ================== //
 function protectUser(req, res, next) {
@@ -73,6 +143,19 @@ app.get("/tentang", (req, res) => {
 });
 
 // =====================================================
+// =================== HEALTH CHECK ====================
+// =====================================================
+app.get("/health", (req, res) => {
+    res.json({
+        status: "online",
+        database: isDatabaseAvailable() ? "connected" : "not configured",
+        message: isDatabaseAvailable() 
+            ? "Aplikasi berjalan dengan database" 
+            : "Aplikasi berjalan tanpa database - tambahkan konfigurasi database di environment variables"
+    });
+});
+
+// =====================================================
 // ======================= USER ========================
 // =====================================================
 
@@ -81,15 +164,24 @@ app.get("/user/dashboard", protectUser, (req, res) => {
     res.render("user/dashboard", { userName: req.session.nama });
 });
 
-// halaman konsultasi (urutkan alfabet)
+// Halaman konsultasi
 app.get("/konsultasi", protectUser, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator.");
+    }
+    
     db.query("SELECT * FROM gejala ORDER BY nama_gejala ASC", (err, gejala) => {
+        if (err) return res.send("DB error: " + err.message);
         res.render("user/index", { gejala, userName: req.session.nama });
     });
 });
 
-// proses diagnosa
+// Proses diagnosa
 app.post("/diagnosa", protectUser, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator.");
+    }
+    
     let gejalaDipilih = req.body.gejala || [];
 
     if (!Array.isArray(gejalaDipilih)) gejalaDipilih = [gejalaDipilih];
@@ -137,6 +229,10 @@ app.post("/diagnosa", protectUser, (req, res) => {
 
 // ================== RIWAYAT USER ================== //
 app.get("/riwayat", protectUser, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator.");
+    }
+    
     const sql = `
         SELECT r.id_riwayat, r.cf, r.tanggal,
                p.nama_penyakit, p.deskripsi, p.solusi
@@ -158,6 +254,10 @@ app.get("/riwayat", protectUser, (req, res) => {
 
 // Detail riwayat
 app.get("/riwayat/:id", protectUser, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator.");
+    }
+    
     const sql = `
         SELECT r.id_riwayat, r.cf, r.tanggal,
                p.nama_penyakit, p.deskripsi, p.solusi
@@ -180,8 +280,11 @@ app.get("/riwayat/:id", protectUser, (req, res) => {
 // ================== REGISTER ================== //
 app.get("/register", (req, res) => res.render("auth/register"));
 app.post("/register", (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Registrasi tidak dapat dilakukan saat ini.");
+    }
+    
     const { nama, email, password } = req.body;
-
     const hashed = bcrypt.hashSync(password, 10);
 
     db.query(
@@ -197,6 +300,12 @@ app.post("/register", (req, res) => {
 // ================== LOGIN USER ================== //
 app.get("/login", (req, res) => res.render("auth/login_user", { error: null }));
 app.post("/login", (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.render("auth/login_user", { 
+            error: "Database tidak tersedia. Silakan coba lagi nanti." 
+        });
+    }
+    
     db.query("SELECT * FROM users WHERE email=? AND role='user'", [req.body.email], (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         if (!rows.length) return res.render("auth/login_user", { error: "Email/Password salah!" });
@@ -216,12 +325,18 @@ app.post("/login", (req, res) => {
 // ======================= ADMIN =======================
 // =====================================================
 
-// login admin
+// Login admin
 app.get("/admin/login", (req, res) =>
     res.render("auth/login_admin", { error: null })
 );
 
 app.post("/admin/login", (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.render("auth/login_admin", { 
+            error: "Database tidak tersedia. Silakan coba lagi nanti." 
+        });
+    }
+    
     db.query("SELECT * FROM users WHERE email=? AND role='admin'", [req.body.email], (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         if (!rows.length) return res.render("auth/login_admin", { error: "Login salah!" });
@@ -239,10 +354,13 @@ app.post("/admin/login", (req, res) => {
 
 // Dashboard Admin
 app.get("/admin/dashboard", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator sistem.");
+    }
+    
     db.query("SELECT COUNT(*) AS c FROM users", (e1, u) => {
         db.query("SELECT COUNT(*) AS c FROM penyakit", (e2, p) => {
             db.query("SELECT COUNT(*) AS c FROM gejala", (e3, g) => {
-
                 res.render("admin/dashboard", {
                     stats: {
                         totalUsers: u[0].c,
@@ -270,7 +388,6 @@ function generateID(prefix, callback) {
 
         if (rows && rows.length) {
             const last = rows[0][col];
-            // last expected like 'G01' or 'P12' — if not, fallback
             const num = parseInt(String(last).substring(1)) || 0;
             next = num + 1;
         }
@@ -284,6 +401,10 @@ function generateID(prefix, callback) {
 // ================== CRUD GEJALA =======================
 // =====================================================
 app.get("/admin/gejala", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator sistem.");
+    }
+    
     db.query("SELECT * FROM gejala ORDER BY id_gejala ASC", (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         res.render("admin/gejala", {
@@ -295,8 +416,11 @@ app.get("/admin/gejala", protectAdmin, (req, res) => {
     });
 });
 
-// ADD Gejala (AUTO G01)
 app.post("/admin/gejala/add", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     generateID("G", (newID) => {
         db.query("INSERT INTO gejala (id_gejala, nama_gejala) VALUES (?, ?)",
             [newID, req.body.nama_gejala],
@@ -308,8 +432,11 @@ app.post("/admin/gejala/add", protectAdmin, (req, res) => {
     });
 });
 
-// EDIT Gejala - GET
 app.get("/admin/gejala/edit/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query("SELECT * FROM gejala WHERE id_gejala=?", [req.params.id], (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         if (!rows.length) return res.send("Gejala tidak ditemukan!");
@@ -323,8 +450,11 @@ app.get("/admin/gejala/edit/:id", protectAdmin, (req, res) => {
     });
 });
 
-// EDIT Gejala - POST
 app.post("/admin/gejala/update/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query(
         "UPDATE gejala SET nama_gejala=? WHERE id_gejala=?",
         [req.body.nama_gejala, req.params.id],
@@ -335,8 +465,11 @@ app.post("/admin/gejala/update/:id", protectAdmin, (req, res) => {
     );
 });
 
-// DELETE gejala
 app.get("/admin/gejala/delete/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query("DELETE FROM gejala WHERE id_gejala=?", [req.params.id], (err) => {
         if (err) return res.send("DB error: " + err.message);
         res.redirect("/admin/gejala");
@@ -347,6 +480,10 @@ app.get("/admin/gejala/delete/:id", protectAdmin, (req, res) => {
 // ================= CRUD PENYAKIT =====================
 // =====================================================
 app.get("/admin/penyakit", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator sistem.");
+    }
+    
     db.query("SELECT * FROM penyakit ORDER BY id_penyakit ASC", (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         res.render("admin/penyakit", {
@@ -358,8 +495,11 @@ app.get("/admin/penyakit", protectAdmin, (req, res) => {
     });
 });
 
-// ADD Penyakit (AUTO P01)
 app.post("/admin/penyakit/add", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     generateID("P", (newID) => {
         db.query(
             "INSERT INTO penyakit (id_penyakit, nama_penyakit, deskripsi, solusi) VALUES (?, ?, ?, ?)",
@@ -372,8 +512,11 @@ app.post("/admin/penyakit/add", protectAdmin, (req, res) => {
     });
 });
 
-// EDIT Penyakit - GET
 app.get("/admin/penyakit/edit/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query("SELECT * FROM penyakit WHERE id_penyakit=?", [req.params.id], (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         if (!rows.length) return res.send("Penyakit tidak ditemukan!");
@@ -387,8 +530,11 @@ app.get("/admin/penyakit/edit/:id", protectAdmin, (req, res) => {
     });
 });
 
-// EDIT Penyakit - POST
 app.post("/admin/penyakit/update/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query(
         "UPDATE penyakit SET nama_penyakit=?, deskripsi=?, solusi=? WHERE id_penyakit=?",
         [req.body.nama_penyakit, req.body.deskripsi, req.body.solusi, req.params.id],
@@ -399,8 +545,11 @@ app.post("/admin/penyakit/update/:id", protectAdmin, (req, res) => {
     );
 });
 
-// DELETE Penyakit
 app.get("/admin/penyakit/delete/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query("DELETE FROM penyakit WHERE id_penyakit=?", [req.params.id], (err) => {
         if (err) return res.send("DB error: " + err.message);
         res.redirect("/admin/penyakit");
@@ -411,6 +560,10 @@ app.get("/admin/penyakit/delete/:id", protectAdmin, (req, res) => {
 // =================== CRUD RELASI =====================
 // =====================================================
 app.get("/admin/relasi", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator sistem.");
+    }
+    
     const q = `
         SELECT r.id_relasi, r.cf,
                p.id_penyakit, p.nama_penyakit,
@@ -435,8 +588,11 @@ app.get("/admin/relasi", protectAdmin, (req, res) => {
     });
 });
 
-// ADD Relasi
 app.post("/admin/relasi/add", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query(
         "INSERT INTO relasi (id_penyakit, id_gejala, cf) VALUES (?, ?, ?)",
         [req.body.id_penyakit, req.body.id_gejala, req.body.cf],
@@ -447,8 +603,11 @@ app.post("/admin/relasi/add", protectAdmin, (req, res) => {
     );
 });
 
-// EDIT Relasi - GET
 app.get("/admin/relasi/edit/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     const q = `
         SELECT r.id_relasi, r.id_penyakit, r.id_gejala, r.cf,
                p.nama_penyakit, g.nama_gejala
@@ -477,8 +636,11 @@ app.get("/admin/relasi/edit/:id", protectAdmin, (req, res) => {
     });
 });
 
-// EDIT Relasi - POST
 app.post("/admin/relasi/update/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query(
         "UPDATE relasi SET id_penyakit=?, id_gejala=?, cf=? WHERE id_relasi=?",
         [req.body.id_penyakit, req.body.id_gejala, req.body.cf, req.params.id],
@@ -489,8 +651,11 @@ app.post("/admin/relasi/update/:id", protectAdmin, (req, res) => {
     );
 });
 
-// DELETE Relasi
 app.get("/admin/relasi/delete/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query("DELETE FROM relasi WHERE id_relasi=?", [req.params.id], (err) => {
         if (err) return res.send("DB error: " + err.message);
         res.redirect("/admin/relasi");
@@ -501,6 +666,10 @@ app.get("/admin/relasi/delete/:id", protectAdmin, (req, res) => {
 // ================= CRUD USERS ADMIN ==================
 // =====================================================
 app.get("/admin/users", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia. Silakan hubungi administrator sistem.");
+    }
+    
     db.query("SELECT id, nama, email, role, created_at FROM users ORDER BY id ASC", (err, rows) => {
         if (err) return res.send("DB error: " + err.message);
         res.render("admin/kelola_user", {
@@ -512,7 +681,6 @@ app.get("/admin/users", protectAdmin, (req, res) => {
     });
 });
 
-// tambah user
 app.get("/admin/users/add", protectAdmin, (req, res) => {
     res.render("admin/user_form", {
         user: null,
@@ -523,8 +691,11 @@ app.get("/admin/users/add", protectAdmin, (req, res) => {
     });
 });
 
-// edit user
 app.get("/admin/users/edit/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     db.query("SELECT id, nama, email, role FROM users WHERE id=?",
         [req.params.id], (err, rows) => {
             if (err) return res.send("DB error: " + err.message);
@@ -538,8 +709,11 @@ app.get("/admin/users/edit/:id", protectAdmin, (req, res) => {
         });
 });
 
-// simpan user
 app.post("/admin/users/save", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
     const { id, nama, email, password, role } = req.body;
 
     if (id) {
@@ -584,12 +758,16 @@ app.get("/logout", (req, res) => {
 
 // ================== START SERVER ================== //
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server berjalan di http://localhost:${PORT}`));
-
-
+app.listen(PORT, () => {
+    console.log(`\n✅ Server berjalan di http://localhost:${PORT}`);
+    console.log(`📊 Status database: ${isDatabaseAvailable() ? 'Terhubung' : 'Tidak dikonfigurasi'}`);
+    console.log(`🔗 Health check: http://localhost:${PORT}/health\n`);
+});
 
 // ================== ADMIN DEFAULT ================== //
 function ensureAdminExists() {
+    if (!isDatabaseAvailable()) return;
+    
     db.query("SELECT COUNT(*) AS cnt FROM users WHERE role='admin'", (err, r) => {
         if (err) return console.error('ERR', err);
         if (r && r[0] && r[0].cnt === 0) {
@@ -598,7 +776,7 @@ function ensureAdminExists() {
                 "INSERT INTO users (nama, email, password, role) VALUES ('Admin', 'admin@sapi.com', ?, 'admin')",
                 [hashed]
             );
-            console.log("Admin default dibuat (admin@sapi.com | admin123)");
+            console.log("✅ Admin default dibuat (admin@sapi.com | admin123)");
         }
     });
 }
