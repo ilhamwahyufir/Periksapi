@@ -586,7 +586,10 @@ app.get("/logout", (req, res) => {
 });
 
 // ================== START SERVER ================== //
-app.listen(port, () => console.log(`SERVER http://localhost:${port}`));
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log('Server berjalan di http://localhost:${PORT}');
+});
 
 // ================== ADMIN DEFAULT ================== //
 function ensureAdminExists() {
