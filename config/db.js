@@ -1,19 +1,27 @@
-// config/db.js
 const mysql = require('mysql2');
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',      // ganti sesuai punya kamu
-  database: 'sistempakar_sapi' // ganti sesuai nama DB
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error('Koneksi database gagal:', err);
-  } else {
-    console.log('Koneksi database berhasil');
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  ssl: {
+    rejectUnauthorized: false
   }
 });
 
-module.exports = db;
+// Test koneksi saat start
+pool.getConnection((err, conn) => {
+  if (err) {
+    console.error('Gagal konek ke database:', err);
+  } else {
+    console.log('Berhasil konek ke database Railway MySQL');
+    conn.release();
+  }
+});
+
+module.exports = pool.promise();
