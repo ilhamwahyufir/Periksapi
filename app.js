@@ -586,11 +586,9 @@ app.get("/logout", (req, res) => {
 });
 
 // ================== START SERVER ================== //
-const PORT = 3000;
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server berjalan di http://localhost:${PORT}`));
 
-app.listen(PORT, () => {
-  console.log(`Server berjalan di http://localhost:${PORT}`);
-});
 
 
 // ================== ADMIN DEFAULT ================== //
