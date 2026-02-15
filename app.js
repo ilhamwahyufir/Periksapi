@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const port = 3000;
+
 
 // ================== KONEKSI DB ================== //
 const db = mysql.createConnection({
@@ -587,9 +587,11 @@ app.get("/logout", (req, res) => {
 
 // ================== START SERVER ================== //
 const PORT = 3000;
+
 app.listen(PORT, () => {
-  console.log('Server berjalan di http://localhost:${PORT}');
+  console.log(`Server berjalan di http://localhost:${PORT}`);
 });
+
 
 // ================== ADMIN DEFAULT ================== //
 function ensureAdminExists() {
