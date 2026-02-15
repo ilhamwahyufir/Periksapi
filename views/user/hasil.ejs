@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Diagnosa - PERIKSAPI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link ke file CSS eksternal -->
+    <link rel="stylesheet" href="/css/hasil.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📋 Hasil Diagnosa</h1>
+            <p class="subtitle">Sistem Pakar Diagnosa Penyakit Sapi</p>
+            <div class="status-badge">✅ Diagnosa Selesai</div>
+        </div>
+
+        <% if (hasil && hasil.length > 0) { %>
+            <% 
+                const utama = hasil[0];
+                const persenUtama = (utama.cf * 100).toFixed(2);
+            %>
+
+            <!-- Main Result Card -->
+            <div class="main-result">
+                <div class="result-header">
+                    <div class="result-icon">🏥</div>
+                    <div class="result-title">
+                        <div class="label">Penyakit yang Terdeteksi</div>
+                        <h2><%= utama.nama_penyakit %></h2>
+                    </div>
+                </div>
+
+                <!-- Confidence Meter -->
+                <div class="confidence-section">
+                    <div class="confidence-label">
+                        <span>Tingkat Kepastian (Certainty Factor)</span>
+                        <span class="confidence-percentage"><%= persenUtama %>%</span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: <%= persenUtama %>%"></div>
+                    </div>
+                </div>
+
+                <!-- Deskripsi -->
+                <div class="info-section">
+                    <h3><span class="icon">📖</span> Deskripsi Penyakit</h3>
+                    <p><%= utama.deskripsi || 'Deskripsi tidak tersedia.' %></p>
+                </div>
+
+                <!-- Solusi -->
+                <div class="info-section">
+                    <h3><span class="icon">💊</span> Solusi & Penanganan</h3>
+                    <p><%= utama.solusi || 'Solusi tidak tersedia. Konsultasikan dengan dokter hewan.' %></p>
+                </div>
+            </div>
+
+            <% if (hasil.length > 1) { %>
+                <!-- Alternative Results -->
+                <div class="alternative-results">
+                    <h3>🔍 Kemungkinan Penyakit Lainnya</h3>
+                    
+                    <% hasil.slice(1).forEach(p => { %>
+                        <div class="alternative-card">
+                            <span class="disease-name"><%= p.nama_penyakit %></span>
+                            <span class="disease-cf"><%= (p.cf * 100).toFixed(2) %>%</span>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+
+        <% } else { %>
+            <!-- No Result -->
+            <div class="no-result">
+                <div class="no-result-icon">🔍</div>
+                <h2>Tidak Ada Hasil Diagnosa</h2>
+                <p>
+                    Maaf, sistem tidak dapat mendeteksi penyakit berdasarkan gejala yang Anda pilih. 
+                    Silakan coba lagi dengan memilih gejala yang lebih spesifik atau konsultasikan 
+                    langsung dengan dokter hewan.
+                </p>
+            </div>
+        <% } %>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <a href="/konsultasi" class="btn-action btn-primary-action">
+                🔄 Diagnosa Ulang
+            </a>
+            <a href="/user/dashboard" class="btn-action btn-secondary-action">
+                🏠 Kembali ke Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script untuk animasi confidence bar -->
+    <script>
+        // Animate confidence bar on page load
+        window.addEventListener('load', function() {
+            const fill = document.querySelector('.confidence-fill');
+            if (fill) {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>

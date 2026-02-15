@@ -1,0 +1,244 @@
+<!-- FILE: views/admin/penyakit_edit.ejs 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= pageTitle || "Edit Penyakit" %></title>
+
+  <style>
+    :root {
+      --topbar-h: 65px;
+      --sidebar-w: 220px;
+      --content-max-w: 800px;
+      --primary: #36a049;
+      --primary-hover: #2f8d3f;
+    }
+
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f6f6f6;
+      color: #222;
+    }
+
+    .main-wrap { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: var(--sidebar-w); }
+
+    .main-area {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      padding-top: var(--topbar-h);
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: var(--content-max-w);
+      margin: 18px auto;
+      padding: 0 18px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 22px;
+      background: transparent;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .card-header h3 { margin: 0; font-size: 22px; }
+
+    .card-body { padding: 24px; }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(54, 160, 73, 0.1);
+    }
+
+    .form-group small {
+      display: block;
+      margin-top: 6px;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .kode-display {
+      display: inline-block;
+      background: #d1fae5;
+      color: #065f46;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 11px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .btn-secondary:hover { background: #d1d5db; }
+
+    @media (max-width: 900px) {
+      .admin-sidebar { display: none; }
+      .main-area { margin-left: 0; }
+      .container { margin: 12px; padding: 0 12px; }
+      .card-header { padding: 14px; }
+      .card-body { padding: 18px; }
+      .form-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-wrap">
+
+    <%- include('../partials/admin/sidebar', { activeMenu: 'penyakit', userName: userName }) %>
+
+   
+    <div class="main-area">
+
+    
+      <%- include('../partials/admin/topbar', { pageTitle: pageTitle || 'Edit Penyakit', userName: userName }) %>
+
+      <div class="container">
+        <div class="card">
+
+          <div class="card-header">
+            <h3>Edit Penyakit</h3>
+          </div>
+
+          <div class="card-body">
+
+            <form action="/admin/penyakit/update/<%= penyakit.id_penyakit %>" method="POST">
+
+              <div class="form-group">
+                <label>Kode Penyakit</label>
+                <div>
+                  <span class="kode-display"><%= penyakit.id_penyakit %></span>
+                </div>
+                <small>Kode tidak dapat diubah</small>
+              </div>
+
+              <div class="form-group">
+                <label for="nama_penyakit">Nama Penyakit <span style="color: #dc3545;">*</span></label>
+                <input 
+                  type="text" 
+                  id="nama_penyakit" 
+                  name="nama_penyakit" 
+                  value="<%= penyakit.nama_penyakit %>" 
+                  placeholder="Nama Penyakit" 
+                  required 
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="deskripsi">Deskripsi</label>
+                <textarea 
+                  id="deskripsi" 
+                  name="deskripsi" 
+                  placeholder="Deskripsi penyakit (opsional)"
+                ><%= penyakit.deskripsi || '' %></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="solusi">Solusi Penanganan</label>
+                <textarea 
+                  id="solusi" 
+                  name="solusi" 
+                  placeholder="Solusi pengobatan atau penanganan (opsional)"
+                ><%= penyakit.solusi || '' %></textarea>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  Simpan Perubahan
+                </button>
+                <a href="/admin/penyakit" class="btn btn-secondary">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  Batal
+                </a>
+              </div>
+
+            </form>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

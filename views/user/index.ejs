@@ -1,0 +1,245 @@
+<!-- FILE: views/user/index.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konsultasi Gejala - PERIKSAPI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link ke file CSS eksternal -->
+    <link rel="stylesheet" href="/css/diagnosa.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/user/dashboard">
+                <div class="logo-icon">🐄</div>
+                PERIKSAPI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/konsultasi">Diagnosa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/riwayat">Riwayat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard#tentang">Tentang Website</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard#panduan">Panduan</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <div class="profile-container">
+                            <img src="https://ui-avatars.com/api/?name=<%= userName || 'User' %>&background=00897b&color=fff&size=128" 
+                                 alt="Profile" 
+                                 class="profile-picture"
+                                 onclick="window.location.href='/profile'">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Header Card -->
+        <div class="header-card">
+            <div class="header-icon">🩺</div>
+            <h1><span class="highlight">Form Konsultasi</span> Gejala</h1>
+            <p>Pilih gejala dibawah ini yang dialami oleh sapi Anda untuk mendapatkan diagnosa penyakit</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <% if (gejala && gejala.length > 0) { %>
+                <form action="/diagnosa" method="POST" id="formGejala">
+                    
+                    <!-- Counter Badge -->
+                    <div class="text-center">
+                        <div class="counter-badge">
+                            <span id="counterText">Belum ada gejala dipilih</span>
+                        </div>
+                    </div>
+
+                    <!-- Search Box -->
+                    <div class="search-box">
+                        <input type="text" 
+                               id="searchInput" 
+                               placeholder="🔍 Cari gejala... (contoh: batuk, demam, lemas)"
+                               autocomplete="off">
+                        <span class="search-icon">🔍</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button type="button" class="btn-action" onclick="resetSearch()">🔄 Reset Pencarian</button>
+                    </div>
+
+                    <!-- Section Title -->
+                    <div class="form-section-title">
+                        <span>📋</span> Daftar Gejala (<%= gejala.length %> gejala tersedia)
+                    </div>
+
+                    <!-- Gejala Grid -->
+                    <div class="gejala-grid" id="gejalaGrid">
+                        <% gejala.forEach(function(g) { %>
+                            <label class="gejala-item" data-nama="<%= g.nama_gejala.toLowerCase() %>">
+                                <input type="checkbox" 
+                                       name="gejala" 
+                                       value="<%= g.id_gejala %>"
+                                       onchange="updateCounter()">
+                                <span class="checkmark"></span>
+                                <span class="gejala-label"><%= g.nama_gejala %></span>
+                            </label>
+                        <% }); %>
+                    </div>
+
+                    <!-- Button Group -->
+                    <div class="button-group">
+                        <a href="/user/dashboard" class="btn-back">⬅ Kembali</a>
+                        <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                            🔬 Diagnosa Sekarang
+                        </button>
+                    </div>
+
+                </form>
+
+            <% } else { %>
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>Belum Ada Data Gejala</h3>
+                    <p>Silakan hubungi administrator untuk menambahkan data gejala ke database.</p>
+                    <br>
+                    <a href="/user/dashboard" class="btn-back">⬅ Kembali ke Dashboard</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Update counter dan enable/disable button
+        function updateCounter() {
+            const checkboxes = document.querySelectorAll('input[name="gejala"]:checked');
+            const count = checkboxes.length;
+            const counterText = document.getElementById('counterText');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (count === 0) {
+                counterText.innerHTML = 'Belum ada gejala dipilih';
+                submitBtn.disabled = true;
+            } else if (count === 1) {
+                counterText.innerHTML = '<span class="counter-number">' + count + '</span> gejala dipilih';
+                submitBtn.disabled = false;
+            } else {
+                counterText.innerHTML = '<span class="counter-number">' + count + '</span> gejala dipilih';
+                submitBtn.disabled = false;
+            }
+
+            // Update visual checkbox parent
+            document.querySelectorAll('.gejala-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    item.classList.add('checked');
+                } else {
+                    item.classList.remove('checked');
+                }
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const items = document.querySelectorAll('.gejala-item');
+                
+                items.forEach(item => {
+                    const namaGejala = item.getAttribute('data-nama');
+                    if (namaGejala.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Select all
+        function selectAll() {
+            const visibleCheckboxes = document.querySelectorAll('.gejala-item:not([style*="display: none"]) input[type="checkbox"]');
+            visibleCheckboxes.forEach(cb => {
+                cb.checked = true;
+            });
+            updateCounter();
+        }
+
+        // Clear all
+        function clearAll() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = false;
+            });
+            updateCounter();
+        }
+
+        // Reset search
+        function resetSearch() {
+            if (searchInput) {
+                searchInput.value = '';
+                const items = document.querySelectorAll('.gejala-item');
+                items.forEach(item => {
+                    item.style.display = 'block';
+                });
+            }
+        }
+
+        // Form validation
+        const form = document.getElementById('formGejala');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                const checked = document.querySelectorAll('input[name="gejala"]:checked');
+                if (checked.length === 0) {
+                    e.preventDefault();
+                    alert('⚠️ Pilih minimal 1 gejala untuk melakukan diagnosa!');
+                }
+            });
+        }
+
+        // Active menu navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPath = window.location.pathname;
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                
+                if (linkPath && !linkPath.startsWith('#')) {
+                    if (currentPath === linkPath || 
+                        (linkPath === '/konsultasi' && currentPath.includes('/konsultasi'))) {
+                        link.classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Initialize counter on page load
+        if (typeof updateCounter === 'function') {
+            updateCounter();
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Diagnosa - PERIKSAPI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link ke file CSS eksternal -->
+    <link rel="stylesheet" href="/css/riwayat.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/user/dashboard">
+                <div class="logo-icon">🐄</div>
+                PERIKSAPI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/konsultasi">Diagnosa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/riwayat">Riwayat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard#tentang">Tentang Website</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard#panduan">Panduan</a>
+                    </li>
+                   <li class="nav-item ms-3">
+                        <div class="profile-container">
+                            <img src="https://ui-avatars.com/api/?name=<%= userName || 'User' %>&background=00897b&color=fff&size=128" 
+                                 alt="Profile" 
+                                 class="profile-picture"
+                                 id="profileBtn">
+                            
+                            <!-- Profile Dropdown -->
+                            <div class="profile-dropdown" id="profileDropdown">
+                                <div class="dropdown-header">
+                                    <div class="dropdown-header-avatar">U</div>
+                                    <div class="dropdown-header-info">
+                                        <p class="dropdown-header-name"><%= userName || 'User Name' %></p>
+                                        <p class="dropdown-header-role">Peternak</p>
+                                    </div>
+                                </div>
+
+                                <div class="dropdown-menu-list">
+                                    <a href="/profile" class="dropdown-menu-item">
+                                        <span class="icon">👤</span>
+                                        <span class="text">Profil Saya</span>
+                                    </a>
+                                    <a href="/pengaturan" class="dropdown-menu-item">
+                                        <span class="icon">⚙️</span>
+                                        <span class="text">Pengaturan</span>
+                                    </a>
+                                    <a href="/bantuan" class="dropdown-menu-item">
+                                        <span class="icon">❓</span>
+                                        <span class="text">Bantuan</span>
+                                    </a>
+                                </div>
+
+                                <div class="dropdown-divider"></div>
+
+                                <div class="dropdown-logout">
+                                    <button class="btn-logout" onclick="logout()">
+                                        <span>🚪</span>
+                                        <span>Keluar</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Header Card -->
+        <div class="header-card">
+            <div class="header-icon">📜</div>
+            <h1><span class="highlight">Riwayat</span> Diagnosa</h1>
+            <p>Lihat semua riwayat diagnosa penyakit sapi yang pernah Anda lakukan</p>
+        </div>
+
+        <!-- Content Card -->
+        <div class="content-card">
+            <% if (!data || data.length === 0) { %>
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <h3>Belum Ada Riwayat Diagnosa</h3>
+                    <p>Anda belum pernah melakukan diagnosa. Mulai diagnosa sekarang untuk melihat riwayat.</p>
+                    <a href="/konsultasi" class="btn-primary-custom">🔬 Mulai Diagnosa</a>
+                    <br><br>
+                    <a href="/user/dashboard" class="btn-back">⬅ Kembali ke Dashboard</a>
+                </div>
+
+            <% } else { %>
+                <!-- Stats Summary -->
+                <div class="stats-summary">
+                    <div class="stat-box">
+                        <span class="stat-number"><%= data.length %></span>
+                        <span class="stat-label">Total Diagnosa</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-number"><%= new Date(data[0].tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) %></span>
+                        <span class="stat-label">Diagnosa Terakhir</span>
+                    </div>
+                </div>
+
+                <!-- Riwayat List -->
+                <div class="riwayat-list">
+                    <% data.forEach(function(item) { %>
+                        <div class="riwayat-card" onclick="window.location.href='/riwayat/<%= item.id_riwayat %>'">
+                            <div class="riwayat-header">
+                                <div class="riwayat-date">
+                                    <span class="date-icon">📅</span>
+                                    <span>
+                                        <%= new Date(item.tanggal).toLocaleString('id-ID', { 
+                                            weekday: 'long',
+                                            year: 'numeric', 
+                                            month: 'long', 
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        }) %>
+                                    </span>
+                                </div>
+                                <div class="cf-badge">
+                                    <%= (item.cf * 100).toFixed(1) %>%
+                                </div>
+                            </div>
+
+                            <div class="penyakit-name">
+                                🩺 <%= item.nama_penyakit %>
+                            </div>
+
+                            <div class="penyakit-desc">
+                                <%= item.deskripsi %>
+                            </div>
+
+                            <a href="/riwayat/<%= item.id_riwayat %>" class="btn-detail" onclick="event.stopPropagation()">
+                                Lihat Detail →
+                            </a>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <!-- Back Button -->
+                <div class="text-center mt-5">
+                    <a href="/user/dashboard" class="btn-back">⬅ Kembali ke Dashboard</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toggle Profile Dropdown
+        const profileBtn = document.getElementById('profileBtn');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        if (profileBtn && profileDropdown) {
+            profileBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                profileDropdown.classList.toggle('show');
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!profileDropdown.contains(e.target) && e.target !== profileBtn) {
+                    profileDropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        // Active menu navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPath = window.location.pathname;
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                
+                if (linkPath && !linkPath.startsWith('#')) {
+                    if (currentPath === linkPath || 
+                        (linkPath === '/riwayat' && currentPath.includes('/riwayat'))) {
+                        link.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

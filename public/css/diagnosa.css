@@ -1,0 +1,591 @@
+/* konsultasi-styles.css - File CSS untuk Halaman Konsultasi PERIKSAPI */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0f7fa 0%, #f1f8e9 100%);
+    min-height: 100vh;
+    padding-top: 80px;
+    padding-bottom: 50px;
+}
+
+/* Navbar */
+.navbar {
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #00897b !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background-color: #00897b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.nav-link {
+    color: #555 !important;
+    margin: 0 15px;
+    font-weight: 500;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #00897b;
+    transition: width 0.3s;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-link:hover {
+    color: #00897b !important;
+}
+
+/* Active navigation link */
+.nav-link.active {
+    color: #00897b !important;
+    font-weight: 700;
+}
+
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* Profile Container */
+.profile-container {
+    position: relative;
+}
+
+.profile-picture {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #00897b;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.profile-picture:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0,137,123,0.4);
+}
+
+/* Profile Dropdown */
+.profile-dropdown {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    width: 280px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+.profile-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-header {
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+    border-radius: 15px 15px 0 0;
+}
+
+.dropdown-header-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #00897b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border: 3px solid white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.dropdown-header-info {
+    flex: 1;
+}
+
+.dropdown-header-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+}
+
+.dropdown-header-role {
+    font-size: 0.85rem;
+    color: #00897b;
+    margin: 0;
+    font-weight: 500;
+}
+
+.dropdown-menu-list {
+    padding: 10px 0;
+}
+
+.dropdown-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #555;
+    text-decoration: none;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.dropdown-menu-item:hover {
+    background-color: #f8f9fa;
+    color: #00897b;
+    transform: translateX(5px);
+}
+
+.dropdown-menu-item .icon {
+    font-size: 1.2rem;
+    width: 25px;
+    text-align: center;
+}
+
+.dropdown-menu-item .text {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #f0f0f0;
+    margin: 10px 0;
+}
+
+.dropdown-logout {
+    padding: 15px 20px;
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-logout:hover {
+    background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(229,57,53,0.3);
+}
+
+/* Main Container */
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header Card */
+.header-card {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    text-align: center;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.header-card h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.header-card h1 .highlight {
+    color: #00897b;
+}
+
+.header-card p {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 0;
+}
+
+.header-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+/* Form Card */
+.form-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.form-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #00897b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Checkbox Grid */
+.gejala-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.gejala-item {
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 15px 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.gejala-item:hover {
+    background: #e0f7fa;
+    border-color: #00897b;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,137,123,0.2);
+}
+
+.gejala-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.gejala-item input[type="checkbox"]:checked ~ .checkmark {
+    background-color: #00897b;
+    border-color: #00897b;
+}
+
+.gejala-item input[type="checkbox"]:checked ~ .checkmark:after {
+    display: block;
+}
+
+.gejala-item input[type="checkbox"]:checked ~ .gejala-label {
+    color: #00897b;
+    font-weight: 600;
+}
+
+.gejala-item.checked {
+    background: #e0f7fa;
+    border-color: #00897b;
+}
+
+.checkmark {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    height: 24px;
+    width: 24px;
+    background-color: white;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.gejala-label {
+    display: block;
+    padding-left: 40px;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.3s;
+}
+
+/* Counter Badge */
+.counter-badge {
+    background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 15px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,137,123,0.3);
+}
+
+.counter-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+/* Submit Button */
+.btn-submit {
+    background: linear-gradient(135deg, #00897b 0%, #00695c 100%);
+    color: white;
+    padding: 15px 50px;
+    border-radius: 30px;
+    border: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(0,137,123,0.3);
+    width: 100%;
+    max-width: 400px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,137,123,0.4);
+    background: linear-gradient(135deg, #00695c 0%, #004d40 100%);
+}
+
+.btn-submit:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-back {
+    background: transparent;
+    color: #00897b;
+    padding: 12px 30px;
+    border-radius: 25px;
+    border: 2px solid #00897b;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.btn-back:hover {
+    background: #00897b;
+    color: white;
+}
+
+/* Search Box */
+.search-box {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 15px 50px 15px 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #00897b;
+    box-shadow: 0 0 0 3px rgba(0,137,123,0.1);
+}
+
+.search-icon {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 1.2rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+}
+
+.btn-action {
+    background: #f8f9fa;
+    color: #555;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.btn-action:hover {
+    background: #00897b;
+    color: white;
+    border-color: #00897b;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state-icon {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 1.5rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body {
+        padding-top: 70px;
+    }
+
+    .header-card h1 {
+        font-size: 2rem;
+    }
+
+    .header-icon {
+        font-size: 3rem;
+    }
+
+    .gejala-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-submit {
+        width: 100%;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn-back {
+        width: 100%;
+        text-align: center;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .form-card {
+        padding: 25px;
+    }
+
+    .action-buttons {
+        justify-content: center;
+    }
+
+    .nav-link {
+        margin: 10px 0;
+    }
+}

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= pageTitle || "Kelola Penyakit" %></title>
+
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+<div class="main-wrap">
+
+<!-- SIDEBAR -->
+<%- include('../partials/admin/sidebar', { activeMenu: 'penyakit', userName }) %>
+
+<div class="main-area">
+<%- include('../partials/admin/topbar', { pageTitle: pageTitle || 'Daftar Penyakit', userName }) %>
+
+<div class="container">
+<div class="card">
+
+<div class="card-header">
+  <h3>Daftar Penyakit</h3>
+</div>
+
+<div class="card-body">
+
+<div class="toolbar">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Cari penyakit...">
+  </div>
+  <button class="btn-primary" onclick="openAddModal()">+ Tambah Penyakit</button>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+  <th>Kode</th>
+  <th>Nama</th>
+  <th>Deskripsi</th>
+  <th>Solusi</th>
+  <th>Aksi</th>
+</tr>
+</thead>
+
+<tbody id="penyakitTable">
+<% if (penyakit && penyakit.length) { %>
+<% penyakit.forEach(p => { %>
+<tr>
+  <td><span class="kode-badge"><%= p.id_penyakit %></span></td>
+  <td><strong><%= p.nama_penyakit %></strong></td>
+  <td><%= p.deskripsi || '-' %></td>
+  <td><%= p.solusi || '-' %></td>
+  <td>
+    <div class="aksi">
+      <button
+        type="button"
+        class="edit"
+        data-id="<%= p.id_penyakit %>"
+        data-nama="<%- p.nama_penyakit %>"
+        data-deskripsi="<%- p.deskripsi || '' %>"
+        data-solusi="<%- p.solusi || '' %>"
+        onclick="openEditModal(this)">
+        Edit
+      </button>
+
+      <a class="hapus"
+         href="/admin/penyakit/delete/<%= p.id_penyakit %>"
+         onclick="return confirm('Yakin ingin menghapus?')">
+        Hapus
+      </a>
+    </div>
+  </td>
+</tr>
+<% }) %>
+<% } else { %>
+<tr>
+  <td colspan="5">
+    <div class="empty-state">Belum ada data penyakit</div>
+  </td>
+</tr>
+<% } %>
+</tbody>
+
+</table>
+</div>
+
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<!-- ================= MODAL TAMBAH ================= -->
+<div class="modal-overlay" id="addModal" onclick="closeAddModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <form action="/admin/penyakit/add" method="POST">
+
+      <div class="form-group">
+        <label>Nama Penyakit</label>
+        <input type="text" name="nama_penyakit" required>
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi</label>
+        <textarea name="deskripsi"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Solusi</label>
+        <textarea name="solusi"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeAddModal()">Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ================= MODAL EDIT ================= -->
+<div class="modal-overlay" id="editModal" onclick="closeEditModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+
+    <form id="editForm" method="POST">
+
+      <div class="form-group">
+        <label>Kode Penyakit</label>
+        <div>
+          <span class="kode-display" id="edit_kode"></span>
+        </div>
+        <small>Kode tidak dapat diubah</small>
+      </div>
+
+      <div class="form-group">
+        <label>Nama Penyakit</label>
+        <input type="text" id="edit_nama" name="nama_penyakit" required>
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi</label>
+        <textarea id="edit_deskripsi" name="deskripsi"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Solusi</label>
+        <textarea id="edit_solusi" name="solusi"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeEditModal()">Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function () {
+  const term = this.value.toLowerCase();
+  document.querySelectorAll('#penyakitTable tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+});
+
+function openAddModal(){
+  document.getElementById('addModal').classList.add('active');
+}
+function closeAddModal(){
+  document.getElementById('addModal').classList.remove('active');
+}
+
+function openEditModal(btn){
+  document.getElementById('editForm').action =
+    '/admin/penyakit/update/' + btn.dataset.id;
+
+  document.getElementById('edit_kode').textContent = btn.dataset.id;
+  document.getElementById('edit_nama').value = btn.dataset.nama;
+  document.getElementById('edit_deskripsi').value = btn.dataset.deskripsi;
+  document.getElementById('edit_solusi').value = btn.dataset.solusi;
+
+  document.getElementById('editModal').classList.add('active');
+}
+function closeEditModal(){
+  document.getElementById('editModal').classList.remove('active');
+}
+</script>
+
+</body>
+</html>

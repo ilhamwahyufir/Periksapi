@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Riwayat - PERIKSAPI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link ke file CSS eksternal -->
+    <link rel="stylesheet" href="/css/riwayatdetail.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light no-print">
+        <div class="container">
+            <a class="navbar-brand" href="/user/dashboard">
+                <div class="logo-icon">🐄</div>
+                PERIKSAPI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/konsultasi">Diagnosa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/riwayat">Riwayat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard#tentang">Tentang Website</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/dashboard#panduan">Panduan</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <div class="profile-container">
+                            <img src="https://ui-avatars.com/api/?name=<%= userName || 'User' %>&background=00897b&color=fff&size=128" 
+                                 alt="Profile" 
+                                 class="profile-picture"
+                                 onclick="window.location.href='/profile'">
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Header Card -->
+        <div class="header-card">
+            <div class="header-icon">📋</div>
+            <h1>Detail Riwayat Diagnosa</h1>
+            <div class="date-time">
+                <span>📅</span>
+                <span>
+                    <%= new Date(r.tanggal).toLocaleString('id-ID', { 
+                        weekday: 'long',
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) %>
+                </span>
+            </div>
+        </div>
+
+        <!-- CF Card -->
+        <div class="cf-card">
+            <div class="cf-label">Nilai Kepastian (Certainty Factor)</div>
+            <div class="cf-value"><%= (r.cf * 100).toFixed(1) %>%</div>
+            <div class="cf-desc">Tingkat keyakinan sistem terhadap diagnosa</div>
+            <div class="progress-container">
+                <div class="progress-bar-custom" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Disease Info -->
+        <div class="info-section">
+            <div class="section-title">
+                <span>🩺</span> Hasil Diagnosa Penyakit
+            </div>
+            <div class="disease-name"><%= r.nama_penyakit %></div>
+            <div class="section-content">
+                <%= r.deskripsi %>
+            </div>
+        </div>
+
+        <!-- Solution -->
+        <div class="info-section">
+            <div class="section-title">
+                <span>💊</span> Solusi & Penanganan
+            </div>
+            <div class="section-content">
+                <% 
+                    // Split solusi by line breaks or periods for better formatting
+                    const solusiLines = r.solusi.split(/\n|\./).filter(line => line.trim().length > 0);
+                %>
+                <% if (solusiLines.length > 1) { %>
+                    <ul class="solution-list">
+                        <% solusiLines.forEach(function(line) { %>
+                            <li><%= line.trim() %></li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <%= r.solusi %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons no-print">
+            <button onclick="window.print()" class="btn-print">
+                <span>🖨️</span> Cetak / Simpan PDF
+            </button>
+            <a href="/riwayat" class="btn-back">
+                <span>⬅</span> Kembali ke Riwayat
+            </a>
+            <a href="/user/dashboard" class="btn-back">
+                <span>🏠</span> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animate progress bar on load
+        window.addEventListener('load', function() {
+            const progressBar = document.querySelector('.progress-bar-custom');
+            if (progressBar) {
+                const targetWidth = '<%= (r.cf * 100).toFixed(1) %>%';
+                setTimeout(() => {
+                    progressBar.style.width = targetWidth;
+                }, 100);
+            }
+        });
+
+        // Active menu navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const currentPath = window.location.pathname;
+            
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                
+                if (linkPath && !linkPath.startsWith('#')) {
+                    if (linkPath === '/riwayat' && currentPath.includes('/riwayat')) {
+                        link.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

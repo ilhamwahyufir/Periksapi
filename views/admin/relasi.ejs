@@ -1,0 +1,536 @@
+<!-- FILE: views/admin/relasi.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= pageTitle || 'Kelola Aturan' %></title>
+
+  <style>
+    :root {
+      --topbar-h: 65px;
+      --sidebar-w: 220px;
+      --content-max-w: 1100px;
+      --primary: #36a049;
+      --primary-hover: #2f8d3f;
+      --danger: #dc3545;
+      --danger-hover: #b02a37;
+    }
+
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #f6f6f6;
+      color: #222;
+    }
+
+    .main-wrap { display: flex; min-height: 100vh; }
+    .admin-sidebar { width: var(--sidebar-w); }
+
+    .main-area {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      padding-top: var(--topbar-h);
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: var(--content-max-w);
+      margin: 18px auto;
+      padding: 0 18px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 22px;
+      background: transparent;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+    }
+    .card-header h3 { margin: 0; font-size: 22px; }
+
+    .card-body { padding: 18px 22px; }
+
+    /* TOOLBAR ATAS */
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+      max-width: 400px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #999;
+      pointer-events: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    /* TABEL */
+    .table-wrap { margin-top: 14px; overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      text-align: left;
+      padding: 14px;
+      background: #fafafa;
+      border-bottom: 2px solid #e5e7eb;
+      font-weight: 600;
+      color: #374151;
+    }
+    tbody td {
+      padding: 14px;
+      border-bottom: 1px solid #f2f2f2;
+      vertical-align: middle;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .cf-badge {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .aksi {
+      display: flex;
+      gap: 6px;
+    }
+
+    .aksi button, .aksi a {
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .aksi .edit {
+      background: #0d6efd;
+      color: #fff;
+    }
+    .aksi .edit:hover { background: #084ecf; }
+
+    .aksi .hapus {
+      background: #dc3545;
+      color: #fff;
+    }
+    .aksi .hapus:hover { background: #b02a37; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9998;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 550px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.3s ease;
+      position: relative;
+      z-index: 9999;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-header {
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 20px;
+      color: #111827;
+    }
+
+    .modal-body {
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+      background: #fff;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(54, 160, 73, 0.1);
+    }
+
+    .form-group small {
+      display: block;
+      margin-top: 4px;
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: #d1d5db; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state p {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .admin-sidebar { display: none; }
+      .main-area { margin-left: 0; }
+      .container { margin: 12px; padding: 0 12px; }
+      .card-header { padding: 14px; }
+      .card-body { padding: 14px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-box { max-width: 100%; }
+      .modal { width: 95%; padding: 20px; }
+      .aksi { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-wrap">
+
+    <!-- SIDEBAR -->
+    <%- include('../partials/admin/sidebar', { activeMenu: 'relasi', userName: userName }) %>
+
+    <!-- AREA KANAN -->
+    <div class="main-area">
+
+      <!-- TOPBAR -->
+      <%- include('../partials/admin/topbar', { pageTitle: pageTitle || 'Kelola Aturan', userName: userName }) %>
+
+      <div class="container">
+        <div class="card">
+
+          <div class="card-header">
+            <h3>Kelola Aturan (Relasi Penyakit - Gejala)</h3>
+          </div>
+
+          <div class="card-body">
+
+            <!-- TOOLBAR: SEARCH & TAMBAH -->
+            <div class="toolbar">
+              <div class="search-box">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Cari aturan..." />
+              </div>
+
+              <button class="btn-primary" onclick="openModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Tambah Aturan
+              </button>
+            </div>
+
+            <!-- TABEL -->
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:80px">ID</th>
+                    <th style="width:220px">Penyakit</th>
+                    <th>Gejala</th>
+                    <th style="width:100px">CF</th>
+                    <th style="width:180px">Aksi</th>
+                  </tr>
+                </thead>
+
+                <tbody id="relasiTable">
+                  <% if (relasi && relasi.length) { %>
+                    <% relasi.forEach((r) => { %>
+                      <tr>
+                        <td><%= r.id_relasi %></td>
+                        <td><strong><%= r.nama_penyakit %></strong></td>
+                        <td><%= r.nama_gejala %></td>
+                        <td><span class="cf-badge"><%= (typeof r.cf === 'number') ? r.cf.toFixed(2) : r.cf %></span></td>
+                        <td>
+                          <div class="aksi">
+                            <a class="edit" href="/admin/relasi/edit/<%= r.id_relasi %>">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                              Edit
+                            </a>
+                            <a class="hapus" href="/admin/relasi/delete/<%= r.id_relasi %>" onclick="return confirm('Yakin ingin menghapus aturan ini?')">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 4px">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                              Hapus
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="5">
+                        <div class="empty-state">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                          </svg>
+                          <p>Belum ada data aturan</p>
+                        </div>
+                      </td>
+                    </tr>
+                  <% } %>
+                </tbody>
+
+              </table>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH ATURAN -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Tambah Aturan Relasi</h3>
+      </div>
+
+      <form action="/admin/relasi/add" method="POST">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="id_penyakit">Penyakit <span style="color: #dc3545;">*</span></label>
+            <select id="id_penyakit" name="id_penyakit" required>
+              <option value="">-- Pilih Penyakit --</option>
+              <% if (penyakit && penyakit.length) { %>
+                <% penyakit.forEach(p => { %>
+                  <option value="<%= p.id_penyakit %>"><%= p.nama_penyakit %></option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="id_gejala">Gejala <span style="color: #dc3545;">*</span></label>
+            <select id="id_gejala" name="id_gejala" required>
+              <option value="">-- Pilih Gejala --</option>
+              <% if (gejala && gejala.length) { %>
+                <% gejala.forEach(g => { %>
+                  <option value="<%= g.id_gejala %>"><%= g.nama_gejala %></option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="cf">Nilai CF (Certainty Factor) <span style="color: #dc3545;">*</span></label>
+            <input type="number" id="cf" name="cf" step="0.01" min="0" max="1" placeholder="0.75" required />
+            <small>Masukkan nilai antara 0 sampai 1 (contoh: 0.75 untuk 75%)</small>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal()">Batal</button>
+          <button type="submit" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Simpan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // MODAL FUNCTIONS
+    function openModal() {
+      document.getElementById('modalOverlay').classList.add('active');
+      document.getElementById('id_penyakit').focus();
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function closeModalOnOverlay(event) {
+      if (event.target === event.currentTarget) {
+        closeModal();
+      }
+    }
+
+    // ESC KEY TO CLOSE MODAL
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    // LIVE SEARCH
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      const rows = document.querySelectorAll('#relasiTable tr');
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>

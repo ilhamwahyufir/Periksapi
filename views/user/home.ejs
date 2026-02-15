@@ -1,0 +1,444 @@
+<!-- home.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Periksapi - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Link ke file CSS eksternal -->
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <div class="logo-icon">🐄</div>
+                PERIKSAPI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/home">Beranda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/konsultasi">Diagnosa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/riwayat">Riwayat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#tentang">Tentang Website</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#panduan">Panduan</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a href="/login" class="btn-login">Login</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a href="/register" class="btn-register">Daftar</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1>
+                        Sistem Pakar <br>
+                        <span class="highlight">Diagnosa Penyakit</span><br>
+                        Sapi
+                    </h1>
+                    <p>
+                        Membantu peternak mendiagnosa penyakit sapi secara cepat dan akurat 
+                        menggunakan teknologi expert system berbasis AI.
+                    </p>
+                    <div>
+                        <a href="/login" class="btn-primary-custom">Mulai Diagnosa</a>
+                        <a href="#tentang" class="btn-secondary-custom">Pelajari Sistem</a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="image-card">
+                        <img src="https://th.bing.com/th/id/R.bc695d191e0df246812c5c9dd58b3bda?rik=MbNj3VkbE1cDTQ&riu=http%3a%2f%2fwww.agrowindo.com%2fwp-content%2fuploads%2f2017%2f06%2fPeluang-Usaha-Budidaya-Sapi-Perah-Dan-Analisa-Usahanya.jpg&ehk=UCxYQjypPXhS3KqjhvZh%2fZmyAA90GBtTRpSUptFECu0%3d&risl=&pid=ImgRaw&r=0" 
+                             alt="Sapi Sehat">
+                        <div class="accuracy-badge">
+                            <span class="number">AI</span>
+                            <span class="label">Expert System</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Praktis Section -->
+    <section class="stats-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title-main">Keunggulan <span class="highlight">PERIKSAPI</span></h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <span class="stat-number">< 3 Menit</span>
+                        <div class="stat-label">Waktu Diagnosa</div>
+                        <p class="stat-desc">Hasil diagnosa cepat dan akurat</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                        </div>
+                        <span class="stat-number">15+</span>
+                        <div class="stat-label">Jenis Penyakit</div>
+                        <p class="stat-desc">Database penyakit yang lengkap</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="white">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                        </div>
+                        <span class="stat-number">24/7</span>
+                        <div class="stat-label">Akses Kapan Saja</div>
+                        <p class="stat-desc">Tersedia setiap saat untuk Anda</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Section - Tentang Website -->
+    <section class="info-section" id="tentang">
+        <div class="container">
+            <div class="info-content">
+                <h2>Apa itu <span class="highlight">PERIKSAPI?</span></h2>
+                
+                <p class="description">
+                    PERIKSAPI adalah sistem pakar (expert system) yang dirancang untuk membantu peternak 
+                    dalam mendiagnosa penyakit sapi secara cepat, akurat, dan mudah. Sistem ini menggunakan 
+                    metode Forward Chaining dan Certainty Factor untuk memberikan hasil diagnosa yang dapat 
+                    diandalkan.
+                </p>
+                
+                <div class="info-divider"></div>
+                
+                <p class="description-secondary">
+                    Dengan PERIKSAPI, peternak dapat melakukan deteksi dini penyakit pada sapi tanpa harus 
+                    langsung ke dokter hewan. Sistem akan menganalisis gejala yang dipilih dan memberikan 
+                    informasi penyakit yang mungkin diderita beserta tingkat kepastiannya, sehingga peternak 
+                    dapat mengambil tindakan yang tepat dengan lebih cepat.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="fitur">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">🩺</div>
+                        <h3>Diagnosa Cepat</h3>
+                        <p>Sistem dapat mengidentifikasi penyakit berdasarkan gejala yang Anda pilih dalam hitungan detik</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Hasil Akurat</h3>
+                        <p>Menggunakan metode Forward Chaining dan Certainty Factor untuk hasil yang terpercaya</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">📱</div>
+                        <h3>Mudah Digunakan</h3>
+                        <p>Antarmuka yang sederhana dan ramah pengguna, bisa diakses kapan saja dari mana saja</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panduan Section -->
+    <section class="panduan-section" id="panduan">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title">Panduan Menggunakan <span class="highlight">PERIKSAPI</span></h2>
+                <p class="section-subtitle">Ikuti langkah-langkah mudah berikut untuk mendapatkan diagnosa penyakit sapi</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="panduan-card">
+                        <div class="panduan-number">1</div>
+                        <div class="panduan-icon">👤</div>
+                        <h4>Daftar/Login</h4>
+                        <p>Buat akun baru atau masuk dengan akun yang sudah ada untuk memulai</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="panduan-card">
+                        <div class="panduan-number">2</div>
+                        <div class="panduan-icon">📝</div>
+                        <h4>Pilih Gejala</h4>
+                        <p>Pilih gejala-gejala yang dialami oleh sapi Anda dari daftar yang tersedia</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="panduan-card">
+                        <div class="panduan-number">3</div>
+                        <div class="panduan-icon">🔍</div>
+                        <h4>Proses Diagnosa</h4>
+                        <p>Sistem akan menganalisis gejala dan memberikan hasil diagnosa penyakit</p>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="panduan-card">
+                        <div class="panduan-number">4</div>
+                        <div class="panduan-icon">📋</div>
+                        <h4>Lihat Hasil</h4>
+                        <p>Dapatkan rekomendasi penanganan dan simpan hasil diagnosa di riwayat</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panduan-detail">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <div class="detail-content">
+                            <h3>Tips Menggunakan Sistem</h3>
+                            <div class="tips-list">
+                                <div class="tip-item">
+                                    <span class="tip-icon">💡</span>
+                                    <div>
+                                        <strong>Amati Dengan Teliti</strong>
+                                        <p>Perhatikan gejala sapi Anda dengan seksama sebelum memilih gejala</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">✅</span>
+                                    <div>
+                                        <strong>Pilih Semua Gejala</strong>
+                                        <p>Centang semua gejala yang sesuai untuk hasil diagnosa yang lebih akurat</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">🩺</span>
+                                    <div>
+                                        <strong>Konsultasi Dokter Hewan</strong>
+                                        <p>Hasil diagnosa sebaiknya dikonfirmasi dengan dokter hewan profesional</p>
+                                    </div>
+                                </div>
+                                <div class="tip-item">
+                                    <span class="tip-icon">📱</span>
+                                    <div>
+                                        <strong>Simpan Riwayat</strong>
+                                        <p>Manfaatkan fitur riwayat untuk memantau kondisi kesehatan sapi Anda</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="panduan-image-wrapper">
+                            <img src="/images/sapi1.jpg" 
+                                 alt="Panduan" 
+                                 class="panduan-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="row">
+                    <!-- Brand Section -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="footer-brand">
+                            <div class="footer-logo-icon">🐄</div>
+                            <h3 class="footer-brand-name">PERIKSAPI</h3>
+                        </div>
+                        <p class="footer-description">
+                            Sistem pakar diagnosa penyakit sapi berbasis AI yang membantu peternak 
+                            mendeteksi penyakit dengan cepat dan akurat menggunakan metode Forward Chaining 
+                            dan Certainty Factor.
+                        </p>
+                        <div class="footer-social">
+                            <a href="#" class="social-link" title="Facebook">📘</a>
+                            <a href="#" class="social-link" title="Instagram">📷</a>
+                            <a href="#" class="social-link" title="Twitter">🐦</a>
+                            <a href="#" class="social-link" title="YouTube">📺</a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="col-lg-2 col-md-4 mb-4">
+                        <div class="footer-section">
+                            <h4>Menu</h4>
+                            <ul class="footer-links">
+                                <li><a href="/">Beranda</a></li>
+                                <li><a href="#tentang">Tentang</a></li>
+                                <li><a href="#panduan">Panduan</a></li>
+                                <li><a href="/login">Login</a></li>
+                                <li><a href="/register">Daftar</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <div class="col-lg-3 col-md-4 mb-4">
+                        <div class="footer-section">
+                            <h4>Fitur</h4>
+                            <ul class="footer-links">
+                                <li><a href="/konsultasi">Diagnosa Penyakit</a></li>
+                                <li><a href="/riwayat">Riwayat Diagnosa</a></li>
+                                <li><a href="#fitur">Expert System</a></li>
+                                <li><a href="#panduan">Cara Penggunaan</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="col-lg-3 col-md-4 mb-4">
+                        <div class="footer-section">
+                            <h4>Kontak</h4>
+                            <div class="footer-contact">
+                                <p>
+                                    <span class="icon">📧</span>
+                                    <span>info@periksapi.com</span>
+                                </p>
+                                <p>
+                                    <span class="icon">📱</span>
+                                    <span>+62 812-3456-7890</span>
+                                </p>
+                                <p>
+                                    <span class="icon">📍</span>
+                                    <span>Surabaya, Indonesia</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p>&copy; 2024 PERIKSAPI. All rights reserved. Made with ❤️ for Indonesian Farmers</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script untuk active menu pada navbar -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ambil semua nav links
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // Fungsi untuk highlight menu berdasarkan section yang sedang dilihat
+            function highlightMenuOnScroll() {
+                const sections = document.querySelectorAll('section[id]');
+                const scrollY = window.pageYOffset;
+                
+                sections.forEach(section => {
+                    const sectionHeight = section.offsetHeight;
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${sectionId}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+                
+                // Highlight Beranda jika di top page
+                if (scrollY < 300) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '/user/home') {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            }
+            
+            // Set active menu berdasarkan current page
+            const currentPath = window.location.pathname;
+            navLinks.forEach(link => {
+                const linkPath = link.getAttribute('href');
+                
+                // Cek jika link adalah path (bukan hash)
+                if (linkPath && !linkPath.startsWith('#')) {
+                    if (currentPath === linkPath || currentPath.includes(linkPath)) {
+                        link.classList.add('active');
+                    }
+                }
+            });
+            
+            // Highlight menu saat scroll
+            window.addEventListener('scroll', highlightMenuOnScroll);
+            
+            // Smooth scroll untuk hash links
+            navLinks.forEach(link => {
+                if (link.getAttribute('href').startsWith('#')) {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href').substring(1);
+                        const targetSection = document.getElementById(targetId);
+                        
+                        if (targetSection) {
+                            // Remove active dari semua links
+                            navLinks.forEach(l => l.classList.remove('active'));
+                            // Add active ke link yang diklik
+                            this.classList.add('active');
+                            
+                            // Smooth scroll ke section
+                            window.scrollTo({
+                                top: targetSection.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

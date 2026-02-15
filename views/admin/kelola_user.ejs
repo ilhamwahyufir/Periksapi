@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= pageTitle || "Kelola User" %></title>
+
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+<div class="main-wrap">
+
+  <!-- SIDEBAR -->
+  <%- include('../partials/admin/sidebar', { activeMenu: 'users', userName }) %>
+
+  <div class="main-area">
+
+    <!-- TOPBAR -->
+    <%- include('../partials/admin/topbar', { pageTitle: pageTitle || 'Kelola User', userName }) %>
+
+    <div class="container">
+      <div class="card">
+
+        <div class="card-header">
+          <h3>Kelola Akun Pengguna</h3>
+        </div>
+
+        <div class="card-body">
+
+          <div class="toolbar">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" placeholder="Cari user...">
+            </div>
+
+            <button class="btn-primary" onclick="openAddUserModal()">+ Tambah Akun</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Dibuat</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% users.forEach(u => { %>
+                <tr>
+                  <td><%= u.id %></td>
+                  <td><strong><%= u.nama %></strong></td>
+                  <td><%= u.email %></td>
+                  <td>
+                    <span class="role-badge role-<%= u.role %>"><%= u.role %></span>
+                  </td>
+                  <td><%= new Date(u.created_at).toLocaleDateString('id-ID') %></td>
+                  <td>
+                    <div class="aksi">
+                      <button class="edit"
+                        onclick="openEditUserModal(
+                          '<%= u.id %>',
+                          '<%= u.nama %>',
+                          '<%= u.email %>',
+                          '<%= u.role %>'
+                        )">
+                        Edit
+                      </button>
+                      <a class="hapus"
+                        href="/admin/users/delete/<%= u.id %>"
+                        onclick="return confirm('Yakin hapus user ini?')">
+                        Hapus
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MODAL USER ================= -->
+<div class="modal-overlay" id="userModal" onclick="closeUserModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+
+    <h3 id="modalTitle">Tambah Akun</h3>
+
+    <form action="/admin/users/save" method="POST">
+      <input type="hidden" name="id" id="user_id">
+
+      <div class="form-group">
+        <label>Nama</label>
+        <input type="text" name="nama" id="user_nama" required>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" id="user_email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" id="user_password">
+        <small id="passwordInfo"></small>
+      </div>
+
+      <div class="form-group">
+        <label>Role</label>
+        <select name="role" id="user_role" required>
+          <option value="">-- Pilih --</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="closeUserModal()">Batal</button>
+        <button type="submit" class="btn-primary">Simpan</button>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function openAddUserModal() {
+  document.getElementById('modalTitle').innerText = 'Tambah Akun';
+  document.getElementById('user_id').value = '';
+  document.getElementById('user_nama').value = '';
+  document.getElementById('user_email').value = '';
+  document.getElementById('user_password').required = true;
+  document.getElementById('passwordInfo').innerText = '';
+  document.getElementById('user_role').value = '';
+
+  document.getElementById('userModal').classList.add('active');
+}
+
+function openEditUserModal(id, nama, email, role) {
+  document.getElementById('modalTitle').innerText = 'Edit Akun';
+  document.getElementById('user_id').value = id;
+  document.getElementById('user_nama').value = nama;
+  document.getElementById('user_email').value = email;
+  document.getElementById('user_role').value = role;
+
+  document.getElementById('user_password').value = '';
+  document.getElementById('user_password').required = false;
+  document.getElementById('passwordInfo').innerText =
+    'Kosongkan jika tidak ingin mengubah password';
+
+  document.getElementById('userModal').classList.add('active');
+}
+
+function closeUserModal(e) {
+  if (!e || e.target === e.currentTarget) {
+    document.getElementById('userModal').classList.remove('active');
+  }
+}
+</script>
+
+<script>
+document.getElementById('searchInput').addEventListener('keyup', function () {
+  const keyword = this.value.toLowerCase();
+  document.querySelectorAll('tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none';
+  });
+});
+</script>
+
+</body>
+</html>

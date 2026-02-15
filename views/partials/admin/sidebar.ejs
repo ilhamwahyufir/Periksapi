@@ -1,0 +1,269 @@
+<!-- views/partials/admin/sidebar.ejs -->
+<style>
+  :root {
+    --sidebar-w: 220px;            /* default lebar */
+    --sidebar-collapsed-w: 72px;  /* lebar saat collapse */
+    --sidebar-bg: #f3f3f3;
+    --sidebar-ink: #111;
+    --transition-speed: 220ms;
+  }
+
+  /* Sidebar container (fixed) */
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    border-right: 1px solid rgba(0,0,0,0.04);
+    box-sizing: border-box;
+    padding: 18px 12px 72px 12px; /* beri ruang bawah utk tombol */
+    overflow: hidden;
+    transition: width var(--transition-speed) ease;
+    z-index: 1100;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  /* Brand (logo + text) */
+  .admin-sidebar .brand {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:6px 6px;
+    margin-bottom:6px;
+  }
+
+  .brand .brand-logo {
+    width:40px;
+    height:40px;
+    object-fit:contain;
+    border-radius:0;          /* opsional: hilangkan rounded */
+    background: transparent;  /* tidak ada background putih */
+    border:none;              /* hilangkan border */
+}
+
+
+  .brand .title {
+    font-weight:700;
+    font-size:21px;
+    color:var(--sidebar-ink);
+    white-space:nowrap;
+  }
+
+  /* Menu list */
+  .menu-list {
+    list-style:none;
+    padding:6px;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:1 1 auto;
+  }
+
+  .menu-list li a.nav-item {
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:10px;
+    border-radius:8px;
+    text-decoration:none;
+    color:var(--sidebar-ink);
+    transition: background var(--transition-speed);
+    white-space:nowrap;
+    overflow:hidden;
+  }
+
+  .menu-list li a .ico {
+    min-width:28px;
+    text-align:center;
+    font-size:18px;
+  }
+
+  .menu-list li a .label {
+    flex:1 1 auto;
+  }
+
+  .menu-list li a:hover { background: rgba(0,0,0,0.03); }
+  .menu-list li a.active { background: rgba(0,0,0,0.06); font-weight:600; }
+
+
+
+  /* Collapse button area (sticky bottom inside sidebar) */
+  .sidebar-collapse {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 16px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .sidebar-collapse button {
+    width:100%;
+    background:#fff;
+    border:1px solid rgba(0,0,0,0.06);
+    border-radius:10px;
+    padding:10px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition: transform var(--transition-speed);
+    font-weight:600;
+  }
+  .sidebar-collapse button:active { transform:translateY(1px); }
+
+  /* Collapsed state: hide labels and shrink sidebar */
+  .sidebar-collapsed .admin-sidebar {
+    width: var(--sidebar-collapsed-w) !important;
+  }
+
+  .sidebar-collapsed .admin-sidebar .brand .title,
+  .sidebar-collapsed .admin-sidebar .menu-list li a .label {
+    display: none;
+  }
+
+  .sidebar-collapsed .admin-sidebar .menu-list li a {
+    justify-content:center;
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .sidebar-collapsed .admin-sidebar .brand .brand-logo {
+    margin: 0 auto;
+  }
+
+  /* Responsive: hide sidebar on small screens */
+  @media (max-width: 900px) {
+    .admin-sidebar { display:none; }
+    .sidebar-collapse { display:none; }
+  }
+</style>
+
+<aside class="admin-sidebar" role="navigation" aria-label="Sidebar utama">
+  <!-- BRAND: gunakan <img> agar ada alt dan lebih accessible -->
+  <div class="brand" title="Periksapi">
+    <img src="/images/logosapiadmin.png" alt="Periksapi" class="brand-logo" onerror="this.src='/images/logosapiadmin.png'">
+    <div class="title">Periksapi</div>
+  </div>
+
+  <ul class="menu-list" role="menu">
+    <% const active = typeof activeMenu !== 'undefined' ? activeMenu : '' %>
+
+    <li role="none">
+      <a role="menuitem" href="/admin/dashboard" class="nav-item <%= active === 'dashboard' ? 'active' : '' %>">
+        <span class="ico">🏠</span>
+        <span class="label">Dashboard</span>
+      </a>
+    </li>
+
+    <li role="none">
+      <a role="menuitem" href="/admin/users" class="nav-item <%= active === 'users' ? 'active' : '' %>">
+        <span class="ico">👥</span>
+        <span class="label">Kelola Akun</span>
+      </a>
+    </li>
+
+    <li role="none">
+      <a role="menuitem" href="/admin/gejala" class="nav-item <%= active === 'gejala' ? 'active' : '' %>">
+        <span class="ico">🔍</span>
+        <span class="label">Daftar Gejala</span>
+      </a>
+    </li>
+
+    <li role="none">
+      <a role="menuitem" href="/admin/penyakit" class="nav-item <%= active === 'penyakit' ? 'active' : '' %>">
+        <span class="ico">📄</span>
+        <span class="label">Daftar Penyakit</span>
+      </a>
+    </li>
+
+    <li role="none">
+      <a role="menuitem" href="/admin/relasi" class="nav-item <%= active === 'relasi' ? 'active' : '' %>">
+        <span class="ico">🔗</span>
+        <span class="label">Kelola Aturan</span>
+      </a>
+    </li>
+
+    
+
+  <div class="sidebar-collapse" aria-hidden="false">
+    <button id="btnSidebarToggle" aria-pressed="false" aria-label="Sembunyikan sidebar">
+      <span id="collapseLabel">Sembunyikan</span>
+      <span id="collapseIcon">◀</span>
+    </button>
+  </div>
+
+  <script>
+    (function(){
+      const root = document.documentElement;
+      const btn = document.getElementById('btnSidebarToggle');
+      const collapseLabel = document.getElementById('collapseLabel');
+      const collapseIcon = document.getElementById('collapseIcon');
+
+      // read CSS variable values (fallbacks)
+      const computed = getComputedStyle(root);
+      const defaultW = (computed.getPropertyValue('--sidebar-w') || '220px').trim();
+      const collapsedW = (computed.getPropertyValue('--sidebar-collapsed-w') || '72px').trim();
+
+      function applySidebarWidth(width) {
+        root.style.setProperty('--sidebar-w', width);
+      }
+
+      function isCollapsed() {
+        return root.classList.contains('sidebar-collapsed');
+      }
+
+      function updateBtnUI() {
+        if (isCollapsed()) {
+          btn.setAttribute('aria-pressed', 'true');
+          collapseLabel.textContent = '';
+          collapseIcon.textContent = '▶ ';
+          applySidebarWidth(collapsedW);
+        } else {
+          btn.setAttribute('aria-pressed', 'false');
+          collapseLabel.textContent = 'Sembunyikan';
+          collapseIcon.textContent = '◀';
+          applySidebarWidth(defaultW);
+        }
+      }
+
+      // try restore preference
+      try {
+        const pref = localStorage.getItem('sidebar-collapsed');
+        if (pref === '1') root.classList.add('sidebar-collapsed');
+      } catch (e) { /* ignore */ }
+
+      // initial apply
+      updateBtnUI();
+
+      btn.addEventListener('click', function(e){
+        e.preventDefault();
+        root.classList.toggle('sidebar-collapsed');
+        updateBtnUI();
+        try { localStorage.setItem('sidebar-collapsed', isCollapsed() ? '1' : '0'); } catch(e){}
+      });
+
+      btn.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
+        }
+      });
+
+      // also observe class changes so other scripts can toggle and UI updates
+      const obs = new MutationObserver(function(muts){
+        for (const m of muts) {
+          if (m.attributeName === 'class') updateBtnUI();
+        }
+      });
+      obs.observe(root, { attributes: true });
+
+    })();
+  </script>
+</aside>

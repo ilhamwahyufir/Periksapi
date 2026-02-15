@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= pageTitle || 'Dashboard Admin' %></title>
+
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
+  <!-- CSS ADMIN -->
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="/css/dashboard-admin.css">
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+  <%- include('../partials/admin/sidebar', { activeMenu: 'dashboard' }) %>
+
+  <!-- TOPBAR -->
+  <%- include('../partials/admin/topbar') %>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="container-inner">
+
+      <!-- JUDUL HALAMAN -->
+      <h1 class="admin-title">
+        <%= pageTitle || 'Dashboard' %>
+      </h1>
+
+      <!-- STAT CARDS -->
+      <div class="cards">
+
+        <div class="card-stat">
+          <div>
+            <div class="label">Total User</div>
+            <div class="num">
+              <%= (stats && stats.totalUsers) ? stats.totalUsers : 0 %>
+            </div>
+          </div>
+          <div class="small-ico">👥</div>
+        </div>
+
+        <div class="card-stat">
+          <div>
+            <div class="label">Daftar Penyakit</div>
+            <div class="num">
+              <%= (stats && stats.totalPenyakit) ? stats.totalPenyakit : 0 %>
+            </div>
+          </div>
+          <div class="small-ico">📄</div>
+        </div>
+
+        <div class="card-stat">
+          <div>
+            <div class="label">Daftar Gejala</div>
+            <div class="num">
+              <%= (stats && stats.totalGejala) ? stats.totalGejala : 0 %>
+            </div>
+          </div>
+          <div class="small-ico">🔍</div>
+        </div>
+
+      </div>
+
+      <!-- QUICK ACCESS & AKTIVITAS TERKINI -->
+      <div class="dashboard-grid">
+        
+        <!-- QUICK ACCESS -->
+        <div class="panel">
+          <div class="section-header">
+            <div class="section-title-wrapper">
+              <span class="title-icon">⚡</span>
+              <h5 class="panel-title">Quick Access</h5>
+            </div>
+            <span class="menu-count">4 Menu</span>
+          </div>
+          <div class="quick-access-grid">
+            
+            <a href="/admin/kelola-user" class="quick-box">
+              <div class="quick-icon-box">
+                👥
+              </div>
+              <h6>Kelola User</h6>
+              <p>Manajemen data pengguna sistem</p>
+            </a>
+
+            <a href="/admin/penyakit" class="quick-box">
+              <div class="quick-icon-box">
+                📄
+              </div>
+              <h6>Kelola Penyakit</h6>
+              <p>Database penyakit sapi</p>
+            </a>
+
+            <a href="/admin/gejala" class="quick-box">
+              <div class="quick-icon-box">
+                🔍
+              </div>
+              <h6>Kelola Gejala</h6>
+              <p>Daftar gejala penyakit</p>
+            </a>
+
+            <a href="/admin/relasi" class="quick-box">
+              <div class="quick-icon-box">
+                🔗
+              </div>
+              <h6>Kelola Relasi</h6>
+              <p>Relasi gejala & penyakit</p>
+            </a>
+
+          </div>
+        </div>
+
+        <!-- AKTIVITAS TERKINI -->
+        <div class="panel">
+          <div class="section-header">
+            <div class="section-title-wrapper">
+              <span class="title-icon">📋</span>
+              <h5 class="panel-title">Aktivitas Terkini</h5>
+            </div>
+          </div>
+          <div class="activity-grid">
+            
+            <div class="activity-box">
+              <div class="activity-icon-box">
+                👥
+              </div>
+              <div class="activity-content">
+                <h6><%= (stats && stats.totalUsers) ? stats.totalUsers : 0 %> User Terdaftar</h6>
+                <p>Total pengguna sistem</p>
+              </div>
+            </div>
+
+            <div class="activity-box">
+              <div class="activity-icon-box">
+                📄
+              </div>
+              <div class="activity-content">
+                <h6><%= (stats && stats.totalPenyakit) ? stats.totalPenyakit : 0 %> Penyakit</h6>
+                <p>Database penyakit aktif</p>
+              </div>
+            </div>
+
+            <div class="activity-box">
+              <div class="activity-icon-box">
+                🔍
+              </div>
+              <div class="activity-content">
+                <h6><%= (stats && stats.totalGejala) ? stats.totalGejala : 0 %> Gejala</h6>
+                <p>Total gejala tercatat</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PANEL RINGKASAN (PINDAH KE BAWAH) -->
+      <section class="panel">
+        <h5 class="panel-title">Ringkasan</h5>
+        <p class="panel-text">
+          Gunakan menu di sebelah kiri untuk mengelola akun, penyakit, gejala,
+          serta aturan (relasi). Menu relasi digunakan untuk mengatur bobot
+          Certainty Factor (CF) antara gejala dan penyakit.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+</body>
+</html>

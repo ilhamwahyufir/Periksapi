@@ -1,0 +1,46 @@
+<!-- FILE: views/admin/penyakit_form.ejs 
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= pageTitle || (penyakit ? 'Edit Penyakit' : 'Tambah Penyakit') %></title>
+  <style>
+    :root { --topbar-h:65px; --sidebar-w:220px; --content-max-w:1100px; }
+    body{margin:0;font-family:Inter,system-ui,Arial;background:#f6f6f6;}
+    .main-wrap{display:flex;min-height:100vh;}
+    .admin-sidebar{width:var(--sidebar-w);}
+    .main-area{flex:1;margin-left:var(--sidebar-w);padding-top:var(--topbar-h);box-sizing:border-box;}
+    .container{max-width:var(--content-max-w);margin:18px auto;padding:0 18px;}
+    .card{background:#fff;border-radius:8px;padding:18px;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+    input,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;box-sizing:border-box;font-family:inherit;}
+    .btn-save{background:#0d6efd;color:#fff;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;}
+  </style>
+</head>
+<body>
+  <div class="main-wrap">
+    <%- include('../partials/admin/sidebar', { activeMenu: 'penyakit', userName: userName }) %>
+    <div class="main-area">
+      <%- include('../partials/admin/topbar', { pageTitle: pageTitle || (penyakit ? 'Edit Penyakit' : 'Tambah Penyakit'), userName: userName }) %>
+      <div class="container">
+        <div class="card">
+          <h3><%= pageTitle || (penyakit ? 'Edit Penyakit' : 'Tambah Penyakit') %></h3>
+
+          <form action="<%= action %>" method="POST" style="margin-top:12px; display:flex;flex-direction:column;gap:12px;">
+            <% if (penyakit) { %>
+              <input type="hidden" name="id" value="<%= penyakit.id_penyakit %>" />
+            <% } %>
+            <input type="text" name="nama_penyakit" placeholder="Nama Penyakit" value="<%= penyakit ? penyakit.nama_penyakit : '' %>" required />
+            <textarea name="deskripsi" placeholder="Deskripsi"><%= penyakit ? penyakit.deskripsi : '' %></textarea>
+            <textarea name="solusi" placeholder="Solusi"><%= penyakit ? penyakit.solusi : '' %></textarea>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-save" type="submit">Simpan</button>
+              <a href="/admin/penyakit" style="align-self:center;">Batal</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html> -->
