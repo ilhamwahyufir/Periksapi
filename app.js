@@ -750,6 +750,17 @@ app.post("/admin/users/save", protectAdmin, (req, res) => {
     }
 });
 
+app.get("/admin/users/delete/:id", protectAdmin, (req, res) => {
+    if (!isDatabaseAvailable()) {
+        return res.send("Database tidak tersedia.");
+    }
+    
+    db.query("DELETE FROM users WHERE id=?", [req.params.id], (err) => {
+        if (err) return res.send("DB error: " + err.message);
+        res.redirect("/admin/users");
+    });
+});
+
 // ================== LOGOUT ================== //
 app.get("/logout", (req, res) => {
     req.session.destroy();
